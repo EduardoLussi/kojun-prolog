@@ -1,27 +1,31 @@
 :- use_module(library(clpfd)).
+:- use_module(library(occurs)).
 
-kojun(Rows) :-
-        length(Rows, 9), maplist(same_length(Rows), Rows),
-        append(Rows, Vs), Vs ins 1..9,
-        maplist(all_distinct, Rows),
-        transpose(Rows, Columns),
-        maplist(all_distinct, Columns),
-        Rows = [As,Bs,Cs,Ds,Es,Fs,Gs,Hs,Is],
-        blocks(As, Bs, Cs),
-        blocks(Ds, Es, Fs),
-        blocks(Gs, Hs, Is).
+% Soluciona o Kojun
+kojun(Matrix, Groups, Matrix) :-
+        append(Matrix, V), length(Matrix, L), M is L^2, V ins 1..M,
+        groupSize(Matrix, Groups, Groups).
 
-blocks([], [], []).
-blocks([N1,N2,N3|Ns1], [N4,N5,N6|Ns2], [N7,N8,N9|Ns3]) :-
-        all_distinct([N1,N2,N3,N4,N5,N6,N7,N8,N9]),
-        blocks(Ns1, Ns2, Ns3).
+% Filtragem por tamanho do grupo
+groupSize([], [], _).
+groupSize([MatrixLine | RestMatrix], [GroupsLine | RestGroups], Groups) :- groupSizeLine(MatrixLine, GroupsLine, Groups), groupSize(RestMatrix, RestGroups, Groups).
 
-problem(1, [[_,_,_,_,_,_,_,_,_],
-            [_,_,_,_,_,3,_,8,5],
-            [_,_,1,_,2,_,_,_,_],
-            [_,_,_,5,_,7,_,_,_],
-            [_,_,4,_,_,_,1,_,_],
-            [_,9,_,_,_,_,_,_,_],
-            [5,_,_,_,_,_,_,7,3],
-            [_,_,2,_,1,_,_,_,_],
-            [_,_,_,_,4,_,_,_,9]]).
+groupSizeLine([], [], _).
+groupSizeLine([Elem | RestElems], [Group | RestGroups], Groups) :- occurrences_of_term(Group, Groups, OccurGroup), between(1, OccurGroup, Elem), groupSizeLine(RestElems, RestGroups, Groups).
+
+problem(1, [[_,_,_,_,_,_,_,_],
+            [_,1,3,_,_,_,_,_],
+            [_,_,_,_,_,3,_,_],
+            [_,_,3,_,_,_,_,_],
+            [_,5,_,3,_,_,_,_],
+            [_,2,_,_,_,_,_,_],
+            [_,_,_,_,_,_,3,_],
+            [_,_,5,3,_,_,_,_]],
+           [[0 ,0 ,1 ,1 ,2 ,3 ,4 ,4 ],
+            [0 ,0 ,5 ,1 ,6 ,3 ,3 ,4 ],
+            [5 ,5 ,5 ,7 ,6 ,8 ,9 ,9 ],
+            [10,10,10,7 ,6 ,8 ,8 ,9 ],
+            [11,7 ,7 ,7 ,7 ,8 ,8 ,9 ],
+            [11,12,13,13,13,14,15,9 ],
+            [12,12,12,12,16,14,14,14],
+            [17,16,16,16,16,14,18,18]]).
