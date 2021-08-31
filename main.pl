@@ -10,7 +10,9 @@ kojun(Matrix, Groups) :-
         orthogonalAdjacent(Matrix),             % Xij != Xij+1
         transpose(Matrix, TMatrix),
         orthogonalAdjacent(TMatrix),            % Xij != Xi+1j
-        groupRepetition(Matrix, Groups).        % Grupo não possui elementos repetidos
+        groupRepetition(Matrix, Groups),        % Grupo não possui elementos repetidos
+        upGreaterFilter(Matrix, Groups, L),        % Se elementos forem do mesmo grupo, o de cima deve ser maior
+        !.
 
 % Instâncias de problemas
 problem(1, [[_,_,_,_,_,_,_,_],
@@ -53,6 +55,49 @@ remove(0, [_ | Xt], Xt) :- !.
 remove(I, [H | Xt], [H | Yt]) :- I1 is I - 1, remove(I1, Xt, Yt), !.
 
 % ==================== Filters
+
+upGreaterFilterCol(Matrix, Groups, Length, I, J) :-
+        J #< Length,
+        I1 is I + 1,
+
+        nth0(I, Matrix, IElem),
+        nth0(J, IElem, JElem),
+
+        nth0(I1, Matrix, IElem1),
+        nth0(J, IElem1, JElem1),
+
+        nth0(I, Groups, IGroup),
+        nth0(J, IGroup, JGroup),
+
+        nth0(I1, Groups, IGroup1),
+        nth0(J, IGroup1, JGroup1),
+
+        % print(JGroup),
+        % print(JGroup1),
+        % print(''),
+
+        
+        (JElem #> JElem1,
+        JGroup #= JGroup1) ;
+
+        % (JGroup = JGroup1 -> JElem #> JElem1),
+
+        (J1 is J + 1,
+        upGreaterFilterCol(Matrix, Groups, Length, I, J1)).
+
+
+upGreaterFilterList(Matrix, Groups, Length, I) :-
+        I #< Length,
+
+        upGreaterFilterCol(Matrix, Groups, Length, I, 0) ;
+
+        (I1 is I + 1,
+        upGreaterFilterList(Matrix, Groups, Length, I1)).
+
+
+% Filtra dado que o elemento de baixo precisa ser menor (se forem do mesmo grupo)
+upGreaterFilter(Matrix, Groups, Length) :-
+        upGreaterFilterList(Matrix, Groups, Length, 0).
 
 % Filtragem por repetição de elementos em um grupo
 groupRepetition(Matrix, Groups) :- 
