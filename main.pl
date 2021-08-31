@@ -2,16 +2,32 @@
 :- use_module(library(occurs)).
 
 % Soluciona o Kojun
-kojun(Matrix, Groups, Matrix) :-
+kojun(Matrix, Groups) :-
         append(Matrix, V), length(Matrix, L), M is L^2, V ins 1..M,
-        groupSize(Matrix, Groups, Groups).
+        groupSize(Matrix, Groups, Groups),
+        orthogonalAdjacent(Matrix),
+        transpose(Matrix, TMatrix),
+        orthogonalAdjacent(TMatrix).
+
+% Filtragem pela regra dos ortogonais adjacentes
+orthogonalAdjacentLine([]).
+orthogonalAdjacentLine([_ | []]).
+orthogonalAdjacentLine([El0, El1 | RestEl]) :- all_distinct([El0, El1]), orthogonalAdjacentLine([El1 | RestEl]).
+
+orthogonalAdjacent([]).
+orthogonalAdjacent([MatrixLine | RestMatrix]) :- orthogonalAdjacentLine(MatrixLine), orthogonalAdjacent(RestMatrix).
 
 % Filtragem por tamanho do grupo
 groupSize([], [], _).
-groupSize([MatrixLine | RestMatrix], [GroupsLine | RestGroups], Groups) :- groupSizeLine(MatrixLine, GroupsLine, Groups), groupSize(RestMatrix, RestGroups, Groups).
+groupSize([MatrixLine | RestMatrix], [GroupsLine | RestGroups], Groups) :- 
+        groupSizeLine(MatrixLine, GroupsLine, Groups),
+        groupSize(RestMatrix, RestGroups, Groups).
 
 groupSizeLine([], [], _).
-groupSizeLine([Elem | RestElems], [Group | RestGroups], Groups) :- occurrences_of_term(Group, Groups, OccurGroup), between(1, OccurGroup, Elem), groupSizeLine(RestElems, RestGroups, Groups).
+groupSizeLine([Elem | RestElems], [Group | RestGroups], Groups) :- 
+        occurrences_of_term(Group, Groups, OccurGroup), 
+        Elem #=< OccurGroup, 
+        groupSizeLine(RestElems, RestGroups, Groups).
 
 problem(1, [[_,_,_,_,_,_,_,_],
             [_,1,3,_,_,_,_,_],
