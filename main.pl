@@ -11,8 +11,9 @@ kojun(Matrix, Groups) :-
         transpose(Matrix, TMatrix),
         orthogonalAdjacent(TMatrix),            % Xij != Xi+1j
         groupRepetition(Matrix, Groups),        % Grupo não possui elementos repetidos
-        upGreaterFilter(Matrix, Groups, L),        % Se elementos forem do mesmo grupo, o de cima deve ser maior
-        !.
+        upGreaterFilter(Matrix, Groups),        % Se elementos forem do mesmo grupo, o de cima deve ser maior  
+        maplist(label, Matrix),
+        maplist(portray_clause, Matrix), !.
 
 % Instâncias de problemas
 problem(1, [[_,_,_,_,_,_,_,_],
@@ -31,6 +32,41 @@ problem(1, [[_,_,_,_,_,_,_,_],
             [11,12,13,13,13,14,15,9 ],
             [12,12,12,12,16,14,14,14],
             [17,16,16,16,16,14,18,18]]).
+
+problem(2, [[_,3,5,6,_,_,1,2,_,2,_,3,_,4,_,_,4],
+            [2,_,_,2,_,4,_,_,_,_,_,_,_,_,1,_,_],
+            [7,6,5,_,7,_,_,4,_,_,3,_,_,_,6,5,2],
+            [3,_,1,_,5,_,_,_,_,2,_,1,_,_,_,2,_],
+            [_,7,_,2,_,_,3,_,_,_,5,_,_,_,5,_,_],
+            [2,_,5,_,_,_,_,_,_,5,4,_,_,_,6,_,_],
+            [1,_,_,3,1,_,_,_,5,_,_,_,_,1,3,_,_],
+            [4,2,_,_,_,6,_,_,_,_,_,_,_,3,_,5,_],
+            [3,_,6,2,_,3,_,_,4,_,5,_,_,2,_,4,_],
+            [_,_,_,_,3,5,_,_,1,_,_,5,4,_,7,_,7],
+            [3,_,5,_,6,_,2,_,4,_,3,_,_,_,_,_,6],
+            [_,_,_,2,_,_,_,_,_,_,_,5,2,_,1,_,4],
+            [_,4,_,_,_,_,_,_,_,_,1,_,7,_,3,4,_],
+            [1,3,_,_,6,_,_,6,4,_,_,5,_,6,2,_,_],
+            [6,_,_,1,_,2,_,_,7,_,4,_,_,4,_,_,_],
+            [_,3,_,4,_,6,5,_,4,_,_,7,_,1,_,_,3],
+            [_,2,_,_,2,_,4,_,1,2,_,5,4,5,_,2,_]],
+           [[0 ,1 ,1 ,1 ,2 ,2 ,3 ,3 ,3 ,4 ,4 ,5 ,6 ,6 ,6 ,7 ,7 ],
+            [1 ,1 ,1 ,2 ,2 ,2 ,8 ,9 ,3 ,4 ,4 ,5 ,5 ,5 ,6 ,6 ,7 ],
+            [10,10,10,2 ,11,11,8 ,12,3 ,13,4 ,14,14,14,14,14,7 ],
+            [10,10,10,10,11,15,8 ,12,12,13,13,16,16,16,16,14,17],
+            [18,18,18,11,11,15,12,12,12,13,13,13,16,16,16,19,17],
+            [18,18,18,20,11,11,21,21,21,22,22,22,22,22,22,23,17],
+            [18,24,20,20,20,25,25,25,25,26,27,27,28,28,23,23,17],
+            [24,24,24,29,29,29,29,25,30,30,27,31,28,32,32,32,17],
+            [24,24,24,33,29,29,34,34,35,31,31,31,31,32,36,32,17],
+            [37,37,33,33,33,33,34,34,35,35,35,35,38,32,32,39,39],
+            [40,40,41,41,42,42,42,43,43,43,44,38,38,38,45,39,39],
+            [46,40,40,41,42,42,42,43,47,44,44,44,38,45,45,39,39],
+            [46,46,41,41,48,49,49,43,47,44,44,45,45,45,50,50,39],
+            [46,46,51,51,48,49,52,52,52,53,54,45,55,55,50,50,50],
+            [56,57,57,57,48,52,52,52,58,53,54,59,55,55,55,55,50],
+            [56,57,56,48,48,58,58,58,58,58,54,54,54,55,60,60,61],
+            [56,56,56,48,48,62,62,62,62,58,54,54,61,61,61,61,61]]).
 
 % ==================== Utils
 
@@ -56,48 +92,18 @@ remove(I, [H | Xt], [H | Yt]) :- I1 is I - 1, remove(I1, Xt, Yt), !.
 
 % ==================== Filters
 
-upGreaterFilterCol(Matrix, Groups, Length, I, J) :-
-        J #< Length,
-        I1 is I + 1,
-
-        nth0(I, Matrix, IElem),
-        nth0(J, IElem, JElem),
-
-        nth0(I1, Matrix, IElem1),
-        nth0(J, IElem1, JElem1),
-
-        nth0(I, Groups, IGroup),
-        nth0(J, IGroup, JGroup),
-
-        nth0(I1, Groups, IGroup1),
-        nth0(J, IGroup1, JGroup1),
-
-        % print(JGroup),
-        % print(JGroup1),
-        % print(''),
-
-        
-        (JElem #> JElem1,
-        JGroup #= JGroup1) ;
-
-        % (JGroup = JGroup1 -> JElem #> JElem1),
-
-        (J1 is J + 1,
-        upGreaterFilterCol(Matrix, Groups, Length, I, J1)).
-
-
-upGreaterFilterList(Matrix, Groups, Length, I) :-
-        I #< Length,
-
-        upGreaterFilterCol(Matrix, Groups, Length, I, 0) ;
-
-        (I1 is I + 1,
-        upGreaterFilterList(Matrix, Groups, Length, I1)).
-
+upGreaterFilterCol([], [], [], []).
+upGreaterFilterCol([UpElem | RestUpLine], [BottomElem | RestBottomLine], [Group | RestUpGroups], [Group | RestBottomGroups]) :-
+        (UpElem #> BottomElem),
+        upGreaterFilterCol(RestUpLine, RestBottomLine, RestUpGroups, RestBottomGroups).
+upGreaterFilterCol([_ | RestUpLine], [_ | RestBottomLine], [_ | RestUpGroups], [_ | RestBottomGroups]) :-
+        upGreaterFilterCol(RestUpLine, RestBottomLine, RestUpGroups, RestBottomGroups).
 
 % Filtra dado que o elemento de baixo precisa ser menor (se forem do mesmo grupo)
-upGreaterFilter(Matrix, Groups, Length) :-
-        upGreaterFilterList(Matrix, Groups, Length, 0).
+upGreaterFilter([_ | []], [_ | []]).
+upGreaterFilter([UpLine, BottomLine | RestMatrix], [UpGroups, BottomGroups | RestGroups]) :-
+        upGreaterFilterCol(UpLine, BottomLine, UpGroups, BottomGroups),
+        upGreaterFilter([BottomLine | RestMatrix], [BottomGroups | RestGroups]).
 
 % Filtragem por repetição de elementos em um grupo
 groupRepetition(Matrix, Groups) :- 
