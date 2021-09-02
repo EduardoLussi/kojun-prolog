@@ -1,6 +1,13 @@
 :- use_module(library(clpfd)).
 :- use_module(library(occurs)).
 
+% ==================== Main call
+:- initialization(main).
+
+main :- problem(1, Matrix, Groups),
+        kojun(Matrix, Groups),
+        print_matrix(Matrix).
+
 % ==================== Solver
 
 % Soluciona o Kojun
@@ -12,8 +19,7 @@ kojun(Matrix, Groups) :-
         orthogonalAdjacent(TMatrix),            % Xij != Xi+1j
         groupRepetition(Matrix, Groups),        % Grupo não possui elementos repetidos
         upGreaterFilter(Matrix, Groups),        % Se elementos forem do mesmo grupo, o de cima deve ser maior  
-        maplist(label, Matrix),
-        maplist(portray_clause, Matrix), !.
+        maplist(label, Matrix), !.
 
 % Instâncias de problemas
 problem(1, [[_,_,_,_,_,_,_,_],
@@ -69,6 +75,13 @@ problem(2, [[_,3,5,6,_,_,1,2,_,2,_,3,_,4,_,_,4],
             [56,56,56,48,48,62,62,62,62,58,54,54,61,61,61,61,61]]).
 
 % ==================== Utils
+
+% printtar matriz de maneira organizada
+print_line_matrix([]).
+print_line_matrix([H | T]) :- write(H), write(" "), print_line_matrix(T).
+
+print_matrix([]).
+print_matrix([H | T]) :- print_line_matrix(H), nl, print_matrix(T).
 
 % Retorna maior elemento entre A e B
 maxElem(A, B, A) :- A > B, !.
