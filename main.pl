@@ -9,19 +9,6 @@ main :- problem(1, Matrix, Groups),
         print_matrix(Matrix),
         halt.
 
-% ==================== Solver
-
-% Soluciona o Kojun
-kojun(Matrix, Groups) :-
-        append(Matrix, V), length(Matrix, L), M is L^2, V ins 1..M,
-        groupSize(Matrix, Groups, Groups),      % Xij é 1..TamanhoDoGrupo
-        orthogonalAdjacent(Matrix),             % Xij != Xij+1
-        transpose(Matrix, TMatrix),
-        orthogonalAdjacent(TMatrix),            % Xij != Xi+1j
-        groupRepetition(Matrix, Groups),        % Grupo não possui elementos repetidos
-        upGreaterFilter(Matrix, Groups),        % Se elementos forem do mesmo grupo, o de cima deve ser maior  
-        maplist(label, Matrix), !.
-
 % Instâncias de problemas
 problem(1, [[_,_,_,_,_,_,_,_],
             [_,1,3,_,_,_,_,_],
@@ -74,6 +61,19 @@ problem(2, [[_,3,5,6,_,_,1,2,_,2,_,3,_,4,_,_,4],
             [56,57,57,57,48,52,52,52,58,53,54,59,55,55,55,55,50],
             [56,57,56,48,48,58,58,58,58,58,54,54,54,55,60,60,61],
             [56,56,56,48,48,62,62,62,62,58,54,54,61,61,61,61,61]]).
+
+% ==================== Solver
+
+% Soluciona o Kojun
+kojun(Matrix, Groups) :-
+        append(Matrix, V), length(Matrix, L), M is L^2, V ins 1..M,
+        groupSize(Matrix, Groups, Groups),      % Xij é 1..TamanhoDoGrupo
+        orthogonalAdjacent(Matrix),             % Xij != Xij+1
+        transpose(Matrix, TMatrix),
+        orthogonalAdjacent(TMatrix),            % Xij != Xi+1j
+        groupRepetition(Matrix, Groups),        % Grupo não possui elementos repetidos
+        upGreaterFilter(Matrix, Groups),        % Se elementos forem do mesmo grupo, o de cima deve ser maior  
+        maplist(label, Matrix), !.
 
 % ==================== Utils
 
