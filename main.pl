@@ -6,7 +6,8 @@
 
 main :- problem(1, Matrix, Groups),
         kojun(Matrix, Groups),
-        print_matrix(Matrix).
+        print_matrix(Matrix),
+        halt.
 
 % ==================== Solver
 
